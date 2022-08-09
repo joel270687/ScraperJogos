@@ -22,12 +22,13 @@ public class ScraperMain {
     private static CapturaJogosDao capturaJogosDao = new CapturaJogosDaoImpl();
     private static ProcuraSureBetsDao procuraSureBets = new ProcuraSureBetsDaoImpl();
     private static final String URL_INICIO = "https://";
-    private static final String URL_MEIO = "/simulador/jogos.aspx?idesporte=102&idcampeonato=";
+    private static final String URL_MEIO = "/sistema_v2/usuarios/simulador/desktop/jogos.aspx?idesporte=102&idcampeonato=";
 
     public static void main(String[] args) throws IOException, ParseException {
 
-        String idCampeonato = "575067"; //separado por dia de cada semana
-        String[] idCasas = {"alphabet365.net","sportbet365.club","sportbet.club"};//casas que quero comparar as odds
+        String idCampeonato = "574908"; //separado por dia de cada semana
+        //String[] idCasas = {"alphabet365.net","sportbet365.club","sportbet.club"};//casas que quero comparar as odds
+        String[] idCasas = {"alphabet365.net"};//casas que quero comparar as odds
         List<Casa> casas = new ArrayList<>();
 
         for(String idCasa: idCasas){

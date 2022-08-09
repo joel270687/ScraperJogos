@@ -8,7 +8,9 @@ import java.util.List;
  */
 public class Jogos {
     String casa;
+    String logoCasa;
     String fora;
+    String logoFora;
     Date data;
     String link;
     List<Mercados> mercados;
@@ -51,5 +53,21 @@ public class Jogos {
 
     public void setMercados(List<Mercados> mercados) {
         this.mercados = mercados;
+    }
+
+    public String getLogoCasa() {
+        return logoCasa;
+    }
+
+    public void setLogoCasa(String logoCasa) {
+        this.logoCasa = logoCasa;
+    }
+
+    public String getLogoFora() {
+        return logoFora;
+    }
+
+    public void setLogoFora(String logoFora) {
+        this.logoFora = logoFora;
     }
 }

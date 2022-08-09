@@ -24,39 +24,32 @@ public class CapturaJogosDaoImpl implements CapturaJogosDao {
         //Conectando na url usando o Jsoup
         Document doc = Jsoup.connect(url).get(); //pegga toda a página html
         //pegando titulo por Id
-        Element titulo = doc.getElementById("conteudo_tituloCampeonato");
+        //Element titulo = doc.getElementById("conteudo_tituloCampeonato");
         System.out.println("Capturando jogos da : " + url);
 
         //pegando os jogos (a tabela) por ID
-        Element tbody = doc.getElementsByTag("tbody").first();
-        Elements lista1 = tbody.getElementsByClass("background_normal");
-        Elements lista2 = tbody.getElementsByClass("background_hover");
-        Elements listaTodos = new Elements();
-        listaTodos.addAll(lista1);
-        listaTodos.addAll(lista2);
+        Element eventListContainer = doc.getElementsByClass("eventlistContainer").first();
+        Elements listaElementsJogos = eventListContainer.getElementsByClass("cardItem cardItem3");
+        //listaTodos.addAll(lista1);
+        //listaTodos.addAll(lista2);
 
         List<Jogos> listaJogos = new ArrayList<>();
-        int contador =0;
-        for(Element lista : listaTodos){
-            contador ++;
-            Element th1 = lista.getElementsByClass("th_1").first(); //onde fica o nome, liga, data horário
-            Element th5 = lista.getElementsByClass("th_5").first(); //onde fica o link para as ODDS do jogo
+        for(Element lista : listaElementsJogos){
+            String dataJogo = lista.getElementsByClass("date").first().text();
+            String horaJogo = lista.getElementsByClass("hour").first().text();
 
-            Element nome = th1.getElementsByTag("b").first();
-            Element data = th1.getElementsByTag("p").last();
-            Element link = th5.select("a[href]").first();
             DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
             final DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm", Locale.ENGLISH);
 
-            if(nome!=null && data!=null && link!=null) {
-                Jogos jogo = new Jogos();
-                jogo.setCasa(retornaTimeCasa(nome.text()));
-                jogo.setFora(retornaTimeFora(nome.text()));
-                jogo.setData(df.parse(data.text()));
-                jogo.setLink(link.attr("abs:href"));
-                jogo.setMercados(capturaMercadoJogoDao.findMercado(link.attr("abs:href")));
-                listaJogos.add(jogo);
-            }
+            Jogos jogo = new Jogos();
+            jogo.setCasa(lista.getElementsByClass("nameTeam").first().text());
+            jogo.setLogoCasa(lista.getElementsByClass("logoTeam").first().text());
+            jogo.setFora(lista.getElementsByClass("nameTeam").last().text());
+            jogo.setLogoFora(lista.getElementsByClass("logoTeam").last().text());
+            jogo.setData(null);
+            jogo.setLink(lista.getElementsByClass("totalOutcomes-button").first()
+                    .select("a[href]").attr("abs:href"));
+            listaJogos.add(jogo);
         }
      return listaJogos;
     }
