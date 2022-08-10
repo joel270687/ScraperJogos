@@ -26,7 +26,7 @@ public class ScraperMain {
 
     public static void main(String[] args) throws IOException, ParseException {
 
-        String idCampeonato = "574908"; //separado por dia de cada semana
+        String idCampeonato = "574926"; //separado por dia de cada semana
         //String[] idCasas = {"alphabet365.net","sportbet365.club","sportbet.club"};//casas que quero comparar as odds
         String[] idCasas = {"alphabet365.net"};//casas que quero comparar as odds
         List<Casa> casas = new ArrayList<>();

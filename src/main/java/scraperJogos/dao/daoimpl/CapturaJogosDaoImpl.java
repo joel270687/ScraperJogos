@@ -12,10 +12,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class CapturaJogosDaoImpl implements CapturaJogosDao {
     private static CapturaMercadoJogoDao capturaMercadoJogoDao = new CapturaMercadoJogoDaoImpl();
@@ -23,32 +20,26 @@ public class CapturaJogosDaoImpl implements CapturaJogosDao {
     public List<Jogos> capturaJogosDoDia(String url) throws IOException, ParseException {
         //Conectando na url usando o Jsoup
         Document doc = Jsoup.connect(url).get(); //pegga toda a página html
-        //pegando titulo por Id
-        //Element titulo = doc.getElementById("conteudo_tituloCampeonato");
         System.out.println("Capturando jogos da : " + url);
 
-        //pegando os jogos (a tabela) por ID
+        //pegando os jogos (a tabela) por Class
         Element eventListContainer = doc.getElementsByClass("eventlistContainer").first();
         Elements listaElementsJogos = eventListContainer.getElementsByClass("cardItem cardItem3");
-        //listaTodos.addAll(lista1);
-        //listaTodos.addAll(lista2);
 
         List<Jogos> listaJogos = new ArrayList<>();
         for(Element lista : listaElementsJogos){
             String dataJogo = lista.getElementsByClass("date").first().text();
             String horaJogo = lista.getElementsByClass("hour").first().text();
 
-            DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm");
-            final DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm", Locale.ENGLISH);
-
             Jogos jogo = new Jogos();
             jogo.setCasa(lista.getElementsByClass("nameTeam").first().text());
-            jogo.setLogoCasa(lista.getElementsByClass("logoTeam").first().text());
+            jogo.setLogoCasa(lista.select("img").first().absUrl("src"));
             jogo.setFora(lista.getElementsByClass("nameTeam").last().text());
-            jogo.setLogoFora(lista.getElementsByClass("logoTeam").last().text());
-            jogo.setData(null);
+            jogo.setLogoFora(lista.select("img").last().absUrl("src"));
+            jogo.setData(retornaDataMontada(dataJogo,horaJogo));
             jogo.setLink(lista.getElementsByClass("totalOutcomes-button").first()
                     .select("a[href]").attr("abs:href"));
+            jogo.setMercados(capturaMercadoJogoDao.findMercado(jogo.getLink()));
             listaJogos.add(jogo);
         }
      return listaJogos;
@@ -71,10 +62,30 @@ public class CapturaJogosDaoImpl implements CapturaJogosDao {
         System.out.println("\n\nQuantidade de Jogos do dia: "+contador+"\n");
     }
 
-    private String retornaTimeCasa(String nome){ return nome.substring(0, nome.indexOf(" x ")); }
+    private enum Meses {
+        jan("01"), fev("02"), mar("03"), abr("04"), mai("05"), jun("06"),
+        jul("07"), ago("08"), set("09"), out("10"), nov("11"), dez("12");
 
-    private String retornaTimeFora(String nome){
-        return nome.substring(nome.indexOf(" x ")+3);
+        private String mesNumeral;
+
+        private Meses(String mesNumeral){
+            this.mesNumeral = mesNumeral;
+        }
+
+        public String getMesNumeral(){
+            return this.mesNumeral;
+        }
+    }
+
+    private Date retornaDataMontada(String dataJogo, String horaJogo) throws ParseException {
+        String dia = dataJogo.substring(0,2);
+        String mes = Meses.valueOf(dataJogo.substring(3,6)).getMesNumeral();
+        String ano = String.valueOf(new Date().getYear()+1900); //para aparecer o ano corretamente em string
+        String hora = horaJogo.substring(0,2);
+        String minuto = horaJogo.substring(3,5);
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+        Date dataCompleta = formatter.parse(dia + "/"+mes+"/"+ano+" "+hora+":"+minuto);
+        return dataCompleta;
     }
 
 }

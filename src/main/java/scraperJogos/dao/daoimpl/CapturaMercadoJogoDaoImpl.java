@@ -16,43 +16,28 @@ import java.util.List;
 public class CapturaMercadoJogoDaoImpl implements CapturaMercadoJogoDao {
     @Override
     public List<Mercados> findMercado(String url) throws IOException {
-        Document doc = Jsoup.connect(url).get(); //pegga toda a página com as odds do jogo html
-        Element tbody = doc.getElementsByTag("tbody").first(); //pega a tabela com as odss
-        Elements tr = tbody.getElementsByTag("tr"); //pega todas as tags tr
+        Document doc = Jsoup.connect(url).get(); //pegga toda a página
+        Elements market = doc.getElementsByClass("eventdetail-market"); //pega todas os mercados
         List<Mercados> mercadosDoJogo = new ArrayList<>();
-        List<Odds> OddsDoJogo = new ArrayList<>();
-        Mercados mercado = new Mercados();
-
-        for(Element ls : tr) {
-            Element th1 = ls.getElementsByClass("th_1").first();
-            Element th2 = ls.getElementsByClass("th_2").first();
-
-            if (th1 != null && th2 == null) {//achou um novo tipo de mercado
-                if(mercado.getNome()!=null){
-                   mercado.setOdds(OddsDoJogo);
-                   mercadosDoJogo.add(mercado);
-                   mercado = new Mercados();
-                   OddsDoJogo = new ArrayList<>();
-                }
-                mercado.setNome(th1.text());
-                //System.out.println(mercado.getNome());
-            }else if(th1 != null && th2 != null){//achou novo odd
-                Odds novoOdd = new Odds();
-                novoOdd.setId(th1.text());
-                String str = th2.text().replaceAll(",", ".");
-                if(str.equals("")){str = "0.00";}
-                novoOdd.setValor(Double.parseDouble(str));
-                OddsDoJogo.add(novoOdd);
-                //System.out.println(novoOdd.getId()+" --> "+novoOdd.getValor());
-                if(ls.elementSiblingIndex()==tr.size()-1){//so entra pra salvar quando for a ultima linha do elemento
-                    mercado.setOdds(OddsDoJogo);
-                    mercadosDoJogo.add(mercado);
-                    mercado = new Mercados();
-                    OddsDoJogo = new ArrayList<>();
-                }
-            }
+        for(Element mk : market){
+            Mercados mercado = new Mercados();
+            mercado.setNome(mk.getElementsByClass("name").first().text());
+            mercado.setOdds(retornaOddsByMercado(mk));
+            mercadosDoJogo.add(mercado);
         }
         return mercadosDoJogo;
+    }
+
+    private List<Odds> retornaOddsByMercado(Element market){
+        Elements marketBody = market.getElementsByClass("eventdetail-optionItem");
+        List<Odds> listOdds = new ArrayList<>();
+        for(Element mk : marketBody){
+            Odds novoOdd = new Odds();
+            novoOdd.setId(mk.getElementsByClass("name").first().text());
+            novoOdd.setValor(Float.valueOf(mk.getElementsByClass("odd").first().text().replace(",",".")));
+            listOdds.add(novoOdd);
+        }
+        return listOdds;
     }
 
     @Override

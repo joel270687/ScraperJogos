@@ -5,7 +5,7 @@ package scraperJogos.models;
  */
 public class Odds {
     String id;
-    Double valor;
+    Float valor;
 
     public String getId() {
         return id;
@@ -15,11 +15,11 @@ public class Odds {
         this.id = id;
     }
 
-    public Double getValor() {
+    public Float getValor() {
         return valor;
     }
 
-    public void setValor(Double valor) {
+    public void setValor(Float valor) {
         this.valor = valor;
     }
 }
