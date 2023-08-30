@@ -8,9 +8,19 @@ import java.util.List;
  */
 public class JuncaoJogos {
     String casa;
+    String logoCasa;
     String fora;
+    String logoFora;
     Date data;
     List<JuncaoMercados> mercadosPorCasas;
+
+    public String getLogoCasa() { return logoCasa;   }
+
+    public void setLogoCasa(String logoCasa) {  this.logoCasa = logoCasa;   }
+
+    public String getLogoFora() {  return logoFora;    }
+
+    public void setLogoFora(String logoFora) { this.logoFora = logoFora; }
 
     public String getCasa() {
         return casa;

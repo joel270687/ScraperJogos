@@ -3,8 +3,10 @@ package scraperJogos;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import scraperJogos.dao.CapturaJogosDao;
+import scraperJogos.dao.PopulaDados;
 import scraperJogos.dao.ProcuraSureBetsDao;
 import scraperJogos.dao.daoimpl.CapturaJogosDaoImpl;
+import scraperJogos.dao.daoimpl.PopulaDadosImpl;
 import scraperJogos.dao.daoimpl.ProcuraSureBetsDaoImpl;
 import scraperJogos.models.Casa;
 import scraperJogos.models.Gatilho;
@@ -19,7 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ScraperMain {
-    private static CapturaJogosDao capturaJogosDao = new CapturaJogosDaoImpl();
+    private static PopulaDados populaDados = new PopulaDadosImpl();
     private static ProcuraSureBetsDao procuraSureBets = new ProcuraSureBetsDaoImpl();
     private static final String URL_INICIO = "https://";
     private static final String URL_MEIO = "/sistema_v2/usuarios/simulador/desktop/jogos.aspx?idesporte=102&idcampeonato=";
@@ -27,20 +29,13 @@ public class ScraperMain {
     public static void main(String[] args) throws IOException, ParseException {
 
         String idCampeonato = "574926"; //separado por dia de cada semana
-        //String[] idCasas = {"alphabet365.net","sportbet365.club","sportbet.club"};//casas que quero comparar as odds
-        String[] idCasas = {"alphabet365.net"};//casas que quero comparar as odds
-        List<Casa> casas = new ArrayList<>();
+        String[] idCasas = {"sportbet.club"};//casas que quero comparar as odds
+        List<Casa> casas = populaDados.montaListaByCasaAposta(idCasas,idCampeonato);
 
-        for(String idCasa: idCasas){
-            Casa casaTemp = new Casa();
-            casaTemp.setNomeCasa(idCasa);
-            casaTemp.setUrlCompleta(URL_INICIO + idCasa + URL_MEIO + idCampeonato);
-
-            List<Jogos> jogos = new ArrayList<>();
-            jogos = capturaJogosDao.capturaJogosDoDia(casaTemp.getUrlCompleta());
-            casaTemp.setJogosCasa(jogos);
-            casas.add(casaTemp);
-        }
+        //for(Casa cs : casas) {
+        //    List<Jogos> pegaSomenteImparPar = procuraSureBets.separaPorGatilho(cs.getJogosCasa(),null);
+        //    System.out.println("teste");
+        //}
 
         List<JuncaoJogos> allJogosSeparados = new ArrayList<>();
         List<JuncaoJogos> allJogosSeparadosComOdds = new ArrayList<>();

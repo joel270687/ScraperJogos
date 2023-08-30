@@ -5,6 +5,7 @@ import scraperJogos.models.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Joel on 25/05/2022.
@@ -86,12 +87,14 @@ public class ProcuraSureBetsDaoImpl implements ProcuraSureBetsDao {
         for(Casa cs : listaCasas){//criar lista com jogos existentes nas casas informadas
             for(Jogos jg : cs.getJogosCasa()){
                 if(!existeJogoNaLista(jg, listaJogosSeparados)){//se não existe cria novo jogo
-                    JuncaoJogos jogoSeparado = new JuncaoJogos();
-                    jogoSeparado.setCasa(jg.getCasa());
-                    jogoSeparado.setFora(jg.getFora());
-                    jogoSeparado.setData(jg.getData());
-                    listaJogosSeparados.add(jogoSeparado);
+                    JuncaoJogos juncaoJogos = new JuncaoJogos();
+                    juncaoJogos.setCasa(jg.getCasa());
+                    juncaoJogos.setLogoCasa(jg.getLogoCasa());
+                    juncaoJogos.setFora(jg.getFora());
+                    juncaoJogos.setLogoFora(jg.getLogoFora());
+                    juncaoJogos.setData(jg.getData());
 
+                    listaJogosSeparados.add(juncaoJogos);
                 }
             }
         }
@@ -123,6 +126,58 @@ public class ProcuraSureBetsDaoImpl implements ProcuraSureBetsDao {
         }
         return listaAllJogosComOdds;
     }
+
+    @Override
+    public List<Jogos> separaPorGatilho(List<Jogos> listJogos, List<Gatilho> gatilhos) {
+        List<Jogos> tempJogosList = new ArrayList<>();
+
+        Gatilho gatilho = new Gatilho();
+        gatilho.setGatilhoMercado("Ímpar/Par");
+        gatilho.setItemMercado(new String[]{"ímpar","par"});
+
+        for(Jogos jg : listJogos){
+            List<Mercados> tempMercados = jg.getMercados().stream()
+                    .filter( (Mercados m) -> m.getNome().equals( gatilho.getGatilhoMercado()))
+                    .collect(Collectors.toList());
+            Jogos tempJogos = new Jogos();
+            tempJogos.setCasa(jg.getCasa());
+            tempJogos.setFora(jg.getFora());
+            tempJogos.setData(jg.getData());
+            tempJogos.setMercados(tempMercados);
+            tempJogosList.add(tempJogos);
+        }
+        return tempJogosList;
+    }
+
+    @Override
+    public List<JuncaoJogos> filtraByGatilho(List<JuncaoJogos> listJogos, Gatilho gatilho) {
+
+        gatilho = new Gatilho();
+        gatilho.setGatilhoMercado("Ímpar/Par");
+        gatilho.setItemMercado(new String[]{"ímpar","par"});
+
+        List<JuncaoJogos> juncaoJogosTempList = new ArrayList<>();
+
+        for(JuncaoJogos jj : listJogos){
+            JuncaoJogos tempJJ = new JuncaoJogos();
+            tempJJ.setCasa(jj.getCasa());
+            tempJJ.setLogoCasa(jj.getLogoCasa());
+            tempJJ.setFora(jj.getFora());
+            tempJJ.setLogoFora(jj.getLogoFora());
+            tempJJ.setData(jj.getData());
+            for(JuncaoMercados jm : jj.getMercadosPorCasas()){
+                List<Mercados> tempMercados = jm.getMercadoCasa().stream()
+                        .filter( (Mercados m) -> m.getNome().equals( "Ímpar/Par"))
+                        .collect(Collectors.toList());
+                JuncaoMercados tempJM = new JuncaoMercados();
+                tempJM.setUrlCasa(jm.getUrlCasa());
+                tempJM.setNomeCasa(jm.getNomeCasa());
+                tempJM.setMercadoCasa(tempMercados);
+            }
+        }
+        return null;
+    }
+
 
     private boolean existeJogoNaLista(Jogos jogo, List<JuncaoJogos> listaJogosSeparados) {
         for(JuncaoJogos jnc: listaJogosSeparados){

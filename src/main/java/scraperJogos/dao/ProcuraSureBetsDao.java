@@ -2,6 +2,7 @@ package scraperJogos.dao;
 
 import scraperJogos.models.Casa;
 import scraperJogos.models.Gatilho;
+import scraperJogos.models.Jogos;
 import scraperJogos.models.JuncaoJogos;
 
 import java.util.List;
@@ -14,5 +15,7 @@ public interface ProcuraSureBetsDao {
     List<JuncaoJogos> verificaSureBetPorGatilho(List<JuncaoJogos> jncJogos, List<Gatilho> gat);
     List<JuncaoJogos> criaListaAllJogos(List<Casa> listaCasas);
     List<JuncaoJogos> atualizaOddsAllJogosJuntandoCasas(List<Casa> listaCasas, List<JuncaoJogos> listaAllJogos);
+    List<Jogos> separaPorGatilho(List<Jogos> listJogos, List<Gatilho> gatilhos);
+    List<JuncaoJogos> filtraByGatilho(List<JuncaoJogos> listJogos, Gatilho gatilho);
 
 }

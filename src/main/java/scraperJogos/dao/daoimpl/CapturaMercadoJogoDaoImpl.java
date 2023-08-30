@@ -34,7 +34,8 @@ public class CapturaMercadoJogoDaoImpl implements CapturaMercadoJogoDao {
         for(Element mk : marketBody){
             Odds novoOdd = new Odds();
             novoOdd.setId(mk.getElementsByClass("name").first().text());
-            novoOdd.setValor(Float.valueOf(mk.getElementsByClass("odd").first().text().replace(",",".")));
+            String valor = mk.getElementsByClass("odd").first().text();
+            novoOdd.setValor(valor.equals("") ? null : Float.valueOf(valor.replace(",",".")));
             listOdds.add(novoOdd);
         }
         return listOdds;
